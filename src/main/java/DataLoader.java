@@ -12,9 +12,10 @@ public class DataLoader {
         return systemScanner.nextLine();
     }
 
-    public static List<String> getOligonucleotidesFromFile(String fileName) throws FileNotFoundException {
+    public static List<String> getOligonucleotidesFromFile() throws FileNotFoundException {
+        String fileName = getDataFileName();
         List<String> oligonucleotides = new ArrayList<>();
-        fileName = "plik_testowy";
+
         File file = new File("src/assets/" + fileName + ".txt");
         Scanner scanner = new Scanner(file);
 
@@ -23,5 +24,9 @@ public class DataLoader {
         }
 
         return oligonucleotides;
+    }
+
+    public static Integer getInstanceLength(List<String> oligonucleotides) {
+        return oligonucleotides.size() + oligonucleotides.get(0).length() - 1;
     }
 }
