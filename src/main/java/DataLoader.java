@@ -16,7 +16,7 @@ public class DataLoader {
         String fileName = getDataFileName();
         List<String> oligonucleotides = new ArrayList<>();
 
-        File file = new File("src/assets/" + fileName + ".txt");
+        File file = new File("src/assets/" + fileName);
         Scanner scanner = new Scanner(file);
 
         while (scanner.hasNextLine()) {
