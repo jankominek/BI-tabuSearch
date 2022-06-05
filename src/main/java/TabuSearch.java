@@ -1,74 +1,30 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TabuSearch {
 
     static List<String> oligonucleotidesList;
     static List<List<Integer>> matrix;
 
+    public static void main(String[] args) throws IOException {
+        String fileName = DataLoader.getDataFileName();
+        oligonucleotidesList = DataLoader.getOligonucleotidesFromFile(fileName);
+        //System.out.println(oligonucleotidesList);
 
-    public static void main(String[] args) throws URISyntaxException, IOException {
-        System.out.println("Please type file name to be processed");
-        Scanner systemScanner = new Scanner(System.in);
-        String fileName = systemScanner.nextLine();
-
-        // getting oligonucletides from file
-        oligonucleotidesList = getOligonucleotidesFromFile(fileName);
-//        System.out.println(oligonucleotidesList);
-
-        // generate general neighborhood matrix
-        matrix = generateMatrix(oligonucleotidesList);
+        matrix = MatrixGenerator.generateMatrix(oligonucleotidesList);
         printMatrix(matrix);
 
         generateAllGreedyInstances();
 
     }
 
-    static List<String> getOligonucleotidesFromFile(String fileName) throws FileNotFoundException {
-        List<String> oligonucleotides = new ArrayList<>();
-        fileName = "plik_testowy";
-        File file = new File("src/assets/" + fileName + ".txt");
-        Scanner scanner = new Scanner(file);
 
-        while (scanner.hasNextLine()) {
-            oligonucleotides.add(scanner.nextLine());
-        }
 
-        return oligonucleotides;
-    }
 
-    static List<List<Integer>> generateMatrix(List<String> ol) {
-        List<List<Integer>> tempMatrix = new ArrayList<>();
-        for (int i = 0; i < ol.size(); i++) {
-            List<Integer> tempRowMatrix = new ArrayList<>();
-            for (int j = 0; j < ol.size(); j++) {
-                if (i == j) tempRowMatrix.add(100);
-                else {
-                    Integer offset = checkOffset(ol.get(i), ol.get(j), 3);
-                    tempRowMatrix.add(offset);
-                }
-            }
-            tempMatrix.add(tempRowMatrix);
-        }
 
-        return tempMatrix;
-    }
-
-    static Integer checkOffset(String current, String next, int length) {
-
-        Integer offset = 1;
-
-        for (int i = 1; i < length; i++) {
-            if (current.substring(i, length).equals(next.substring(0, length - i))) {
-                break;
-            }
-            offset += 1;
-        }
-        return offset;
-    }
 
     static void generateAllGreedyInstances() {
         Map<String, List<Oligonucleotide>> greedyMapInstaces = new HashMap<>();
