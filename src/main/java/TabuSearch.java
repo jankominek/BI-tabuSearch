@@ -9,6 +9,8 @@ public class TabuSearch {
 
     static List<String> oligonucleotidesList;
     static List<List<Integer>> matrix;
+    static Map<String, List<Oligonucleotide>> generalGreedyMapInstances;
+    static Integer savedInstanceLength;
 
 
     public static void main(String[] args) throws URISyntaxException, IOException {
@@ -34,7 +36,6 @@ public class TabuSearch {
 
     static List<String> getOligonucleotidesFromFile(String fileName) throws FileNotFoundException {
         List<String> oligonucleotides = new ArrayList<>();
-        fileName = "plik_testowy";
         File file = new File("src/assets/"+fileName+".txt");
         Scanner scanner = new Scanner(file);
 
@@ -42,6 +43,7 @@ public class TabuSearch {
             oligonucleotides.add(scanner.nextLine());
         }
 
+        savedInstanceLength = oligonucleotides.size() + oligonucleotides.get(0).length() - 1;
         return oligonucleotides;
     }
 
@@ -52,7 +54,7 @@ public class TabuSearch {
                 for(int j = 0; j<ol.size(); j++){
                     if(i == j) tempRowMatrix.add(100);
                     else{
-                        Integer offset = checkOffset(ol.get(i), ol.get(j), 3);
+                        Integer offset = checkOffset(ol.get(i), ol.get(j), ol.get(i).length());
                         tempRowMatrix.add(offset);
                     }
                 }
@@ -65,7 +67,6 @@ public class TabuSearch {
     static Integer checkOffset(String current, String next, int length){
 
         Integer offset = 1;
-
         for(int i=1; i<length; i++){
             if(current.substring(i, length).equals(next.substring(0, length - i))){
                 break;
@@ -78,12 +79,13 @@ public class TabuSearch {
     static void generateAllGreedyInstances(){
         Map<String, List<Oligonucleotide>> greedyMapInstaces = new HashMap<>();
         oligonucleotidesList.stream().forEach( (oligonucleotide) -> {
-            List<Oligonucleotide> resultOfGreedyFunction = generateGreedyAlgorithmForSelectedInstance(oligonucleotidesList.indexOf(oligonucleotide), oligonucleotide.length(), 8);
-            Double goal = goalFunction(8, resultOfGreedyFunction);
+            List<Oligonucleotide> resultOfGreedyFunction = generateGreedyAlgorithmForSelectedInstance(oligonucleotidesList.indexOf(oligonucleotide), oligonucleotide.length(), savedInstanceLength);
+            Double goal = goalFunction(savedInstanceLength, resultOfGreedyFunction);
             String key = "k"+greedyMapInstaces.size()+"/"+goal;
             greedyMapInstaces.put(key, resultOfGreedyFunction);
         });
 
+        generalGreedyMapInstances = greedyMapInstaces;
 
         for(Map.Entry<String, List<Oligonucleotide>> entry : greedyMapInstaces.entrySet()){
             System.out.print(entry.getKey()+ "   ");
@@ -105,6 +107,9 @@ public class TabuSearch {
                 .build();
         currentLength += lengthInstance;
         selectedOlList.add(oligonucleotide);
+        List<Integer> blockedIndexes = new ArrayList<>();
+
+        blockedIndexes.add(processedOli);
 
         Integer index = processedOli;
 
@@ -115,8 +120,10 @@ public class TabuSearch {
             //szukanie najlepszego oligonukleotydu z offsetem
             for(int j = 0; j<oligonucleotidesList.size(); j++){
                 if(matrix.get(index).get(j) < selectedOffset){
-                    bestSelectedIndex = j;
-                    selectedOffset = matrix.get(index).get(j);
+                    if(!blockedIndexes.contains(j)){
+                        bestSelectedIndex = j;
+                        selectedOffset = matrix.get(index).get(j);
+                    }
                 }
             }
             //dodanie znalezionego offsetu do ogólnej długości
@@ -136,7 +143,7 @@ public class TabuSearch {
                 break;
             }
         }
-
+        System.out.println(blockedIndexes);
         return selectedOlList;
 
     }
