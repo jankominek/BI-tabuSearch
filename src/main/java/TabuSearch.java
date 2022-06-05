@@ -3,7 +3,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TabuSearch {
 
@@ -24,50 +23,46 @@ public class TabuSearch {
         matrix = generateMatrix(oligonucleotidesList);
         printMatrix(matrix);
 
-
         generateAllGreedyInstances();
-
-
-
 
     }
 
     static List<String> getOligonucleotidesFromFile(String fileName) throws FileNotFoundException {
         List<String> oligonucleotides = new ArrayList<>();
         fileName = "plik_testowy";
-        File file = new File("src/assets/"+fileName+".txt");
+        File file = new File("src/assets/" + fileName + ".txt");
         Scanner scanner = new Scanner(file);
 
-        while(scanner.hasNextLine()){
+        while (scanner.hasNextLine()) {
             oligonucleotides.add(scanner.nextLine());
         }
 
         return oligonucleotides;
     }
 
-    static List<List<Integer>> generateMatrix(List<String> ol){
-            List<List<Integer>> tempMatrix = new ArrayList<>();
-            for(int i = 0; i< ol.size(); i++){
-                List<Integer> tempRowMatrix = new ArrayList<>();
-                for(int j = 0; j<ol.size(); j++){
-                    if(i == j) tempRowMatrix.add(100);
-                    else{
-                        Integer offset = checkOffset(ol.get(i), ol.get(j), 3);
-                        tempRowMatrix.add(offset);
-                    }
+    static List<List<Integer>> generateMatrix(List<String> ol) {
+        List<List<Integer>> tempMatrix = new ArrayList<>();
+        for (int i = 0; i < ol.size(); i++) {
+            List<Integer> tempRowMatrix = new ArrayList<>();
+            for (int j = 0; j < ol.size(); j++) {
+                if (i == j) tempRowMatrix.add(100);
+                else {
+                    Integer offset = checkOffset(ol.get(i), ol.get(j), 3);
+                    tempRowMatrix.add(offset);
                 }
-                tempMatrix.add(tempRowMatrix);
             }
+            tempMatrix.add(tempRowMatrix);
+        }
 
-            return tempMatrix;
+        return tempMatrix;
     }
 
-    static Integer checkOffset(String current, String next, int length){
+    static Integer checkOffset(String current, String next, int length) {
 
         Integer offset = 1;
 
-        for(int i=1; i<length; i++){
-            if(current.substring(i, length).equals(next.substring(0, length - i))){
+        for (int i = 1; i < length; i++) {
+            if (current.substring(i, length).equals(next.substring(0, length - i))) {
                 break;
             }
             offset += 1;
@@ -75,19 +70,19 @@ public class TabuSearch {
         return offset;
     }
 
-    static void generateAllGreedyInstances(){
+    static void generateAllGreedyInstances() {
         Map<String, List<Oligonucleotide>> greedyMapInstaces = new HashMap<>();
-        oligonucleotidesList.stream().forEach( (oligonucleotide) -> {
+        oligonucleotidesList.stream().forEach((oligonucleotide) -> {
             List<Oligonucleotide> resultOfGreedyFunction = generateGreedyAlgorithmForSelectedInstance(oligonucleotidesList.indexOf(oligonucleotide), oligonucleotide.length(), 8);
             Double goal = goalFunction(8, resultOfGreedyFunction);
-            String key = "k"+greedyMapInstaces.size()+"/"+goal;
+            String key = "k" + greedyMapInstaces.size() + "/" + goal;
             greedyMapInstaces.put(key, resultOfGreedyFunction);
         });
 
 
-        for(Map.Entry<String, List<Oligonucleotide>> entry : greedyMapInstaces.entrySet()){
-            System.out.print(entry.getKey()+ "   ");
-            for(Oligonucleotide oli : entry.getValue()) {
+        for (Map.Entry<String, List<Oligonucleotide>> entry : greedyMapInstaces.entrySet()) {
+            System.out.print(entry.getKey() + "   ");
+            for (Oligonucleotide oli : entry.getValue()) {
                 System.out.print(oli.getSequence() + "   ");
             }
             System.out.println();
@@ -95,7 +90,7 @@ public class TabuSearch {
 
     }
 
-    static List<Oligonucleotide> generateGreedyAlgorithmForSelectedInstance(Integer processedOli, Integer lengthInstance, Integer generalDNALengthSequence){
+    static List<Oligonucleotide> generateGreedyAlgorithmForSelectedInstance(Integer processedOli, Integer lengthInstance, Integer generalDNALengthSequence) {
         List<Oligonucleotide> selectedOlList = new ArrayList<>();
         Integer currentLength = 0;
         Oligonucleotide oligonucleotide = Oligonucleotide.builder()
@@ -109,12 +104,12 @@ public class TabuSearch {
         Integer index = processedOli;
 
         // to jest pętla po wszystkich oligonukleotydach indeksy i nie mają tutaj znaczenia ( nie chciałem rekurencji robić )
-        for(int i=0; i<oligonucleotidesList.size(); i++){
+        for (int i = 0; i < oligonucleotidesList.size(); i++) {
             Integer bestSelectedIndex = index;
             Integer selectedOffset = 100;
             //szukanie najlepszego oligonukleotydu z offsetem
-            for(int j = 0; j<oligonucleotidesList.size(); j++){
-                if(matrix.get(index).get(j) < selectedOffset){
+            for (int j = 0; j < oligonucleotidesList.size(); j++) {
+                if (matrix.get(index).get(j) < selectedOffset) {
                     bestSelectedIndex = j;
                     selectedOffset = matrix.get(index).get(j);
                 }
@@ -123,7 +118,7 @@ public class TabuSearch {
             currentLength += selectedOffset;
 
             //sprawdzenie czy możemy taki oligonukleotyd dodać
-            if(currentLength <= generalDNALengthSequence) {
+            if (currentLength <= generalDNALengthSequence) {
                 Oligonucleotide selectedOligonucleotide = Oligonucleotide.builder()
                         .sequence(oligonucleotidesList.get(bestSelectedIndex))
                         .offset(selectedOffset)
@@ -132,7 +127,7 @@ public class TabuSearch {
 
                 selectedOlList.add(selectedOligonucleotide);
                 index = bestSelectedIndex;
-            }else{
+            } else {
                 break;
             }
         }
@@ -141,18 +136,18 @@ public class TabuSearch {
 
     }
 
-    static void printMatrix(List<List<Integer>> matrixList){
-        for(int i = 0; i<matrixList.get(0).size() + 1; i++){
-            if(i == 0){
+    static void printMatrix(List<List<Integer>> matrixList) {
+        for (int i = 0; i < matrixList.get(0).size() + 1; i++) {
+            if (i == 0) {
                 System.out.print(String.format("%5s", " "));
-            }else{
-                System.out.print(String.format("%7s", oligonucleotidesList.get(i-1)));
+            } else {
+                System.out.print(String.format("%7s", oligonucleotidesList.get(i - 1)));
             }
         }
         System.out.println("");
-        for(int i=0; i<matrixList.size(); i++){
+        for (int i = 0; i < matrixList.size(); i++) {
             System.out.print(String.format("%2s", oligonucleotidesList.get(i)) + " |");
-            for(int j=0; j<matrixList.size(); j++){
+            for (int j = 0; j < matrixList.size(); j++) {
 
                 System.out.print(String.format("%5s", matrixList.get(i).get(j)) + " |");
             }
@@ -160,8 +155,8 @@ public class TabuSearch {
         }
     }
 
-    static Double goalFunction(Integer generalLengthInstance, List<Oligonucleotide> oligonucleotideList){
-        Double goalValue = oligonucleotideList.size()*1.0 + (oligonucleotideList.size()*1.0/generalLengthInstance);
+    static Double goalFunction(Integer generalLengthInstance, List<Oligonucleotide> oligonucleotideList) {
+        Double goalValue = oligonucleotideList.size() * 1.0 + (oligonucleotideList.size() * 1.0 / generalLengthInstance);
         return goalValue;
     }
 
