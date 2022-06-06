@@ -76,6 +76,8 @@ public class GreedyAlgorithm {
 
                 selectedOlList.add(selectedOligonucleotide);
                 index = bestSelectedIndex;
+                blockedIndexes.add(bestSelectedIndex);
+
             } else {
                 seqLength = currentLength - selectedOffset;
                 break;
