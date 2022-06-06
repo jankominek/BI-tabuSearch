@@ -12,7 +12,7 @@ public class GreedyAlgorithm {
 
         oligonucleotidesList.forEach((oligonucleotide) -> {
             List<Oligonucleotide> resultOfGreedyFunction = generateGreedyAlgorithmForSelectedInstance(oligonucleotidesList.indexOf(oligonucleotide), oligonucleotide.length(), savedInstanceLength, oligonucleotidesList);
-            Double goal = TabuSearch.goalFunction(resultOfGreedyFunction);
+            Double goal = TabuSearch.goalFunction(resultOfGreedyFunction, seqLength);
             String key = "k" + greedyMapInstaces.size() + "/" + goal;
             greedyMapInstaces.put(key, resultOfGreedyFunction);
 
@@ -21,7 +21,12 @@ public class GreedyAlgorithm {
         });
 
         Main.sortedGreedyInstances = greedySequenceList;
+//        printGreedyMapInstaces(greedyMapInstaces);
 
+        return greedyMapInstaces;
+    }
+
+    private static void printGreedyMapInstaces(Map<String, List<Oligonucleotide>> greedyMapInstaces) {
         for (Map.Entry<String, List<Oligonucleotide>> entry : greedyMapInstaces.entrySet()) {
             System.out.print(entry.getKey() + "   ");
             for (Oligonucleotide oli : entry.getValue()) {
@@ -29,9 +34,6 @@ public class GreedyAlgorithm {
             }
             System.out.println();
         }
-
-        return greedyMapInstaces;
-
     }
 
     static List<Oligonucleotide> generateGreedyAlgorithmForSelectedInstance(Integer processedOli, Integer lengthInstance, Integer generalDNALengthSequence, List<String> oligonucleotidesList) {
@@ -85,5 +87,15 @@ public class GreedyAlgorithm {
         }
 //        System.out.println(blockedIndexes);
         return selectedOlList;
+    }
+
+    static void printSortedGreedyInstances() {
+        for (Sequence sequence : Main.sortedGreedyInstances) {
+            System.out.println(sequence.getRating());
+            for (Oligonucleotide o : sequence.getOligonucleotidesList()) {
+                System.out.print(o.getSequence() + " ");
+            }
+            System.out.println();
+        }
     }
 }

@@ -13,14 +13,11 @@ public class Main {
     static int useGreedySequenceIndex = 0;
 
     static int iterationWithoutImprovement = 0;
-    static int itInTabuList = 30;
+    static int itInTabuList = 5;
 
     public static void main(String[] args) throws IOException {
         oligonucleotidesList = DataLoader.getOligonucleotidesFromFile();
         savedInstanceLength = DataLoader.getInstanceLength(oligonucleotidesList);
-
-        System.out.println(oligonucleotidesList);
-        System.out.println(savedInstanceLength);
 
         matrix = MatrixGenerator.generateMatrix(oligonucleotidesList);
         MatrixGenerator.printMatrix(matrix, oligonucleotidesList);
@@ -30,48 +27,128 @@ public class Main {
         Collections.sort(sortedGreedyInstances);
         Collections.reverse(sortedGreedyInstances);
 
-        for (Sequence sequence : sortedGreedyInstances) {
-            System.out.println(sequence.getRating());
-            for (Oligonucleotide o : sequence.getOligonucleotidesList()) {
-                System.out.print(o.getSequence() + " ");
-            }
-            System.out.println();
-        }
+        System.out.println(sortedGreedyInstances.get(0).getRating());
 
-        List<TabuSequence> tabuList = new ArrayList<>();
+        List<Sequence> tabuList = new ArrayList<>();
         sortedGreedyInstances.get(0).setNotUsedOliList(TabuSearch.listOfNotUsedOli(sortedGreedyInstances.get(0)));
+        tabuList.add(sortedGreedyInstances.get(0));
 
-        tabuList.add(new TabuSequence(sortedGreedyInstances.get(0), itInTabuList));
         Sequence bestSequence = new Sequence(sortedGreedyInstances.get(0));
+        Double bestRating = bestSequence.getRating();
         Sequence parenSequence = new Sequence(sortedGreedyInstances.get(0));
 
-//        while (1) {
-        List<Sequence> neighbors = new ArrayList<>();
+        int iteratonCounter = 0;
+        while (true) {
+            iteratonCounter++;
+            List<Sequence> neighbors = new ArrayList<>();
+            List<Integer> worstIndexes = TabuSearch.findWorstOffset(parenSequence);
 
-        List<Integer> worstIndexes = TabuSearch.findTwoWorstOffset(parenSequence);
+            List<Sequence> child = TabuSearch.actionSwapAll(parenSequence, worstIndexes);
+            if (child.size() > 0)
+                neighbors.addAll(child);
 
-        Sequence swapChild = TabuSearch.actionSwap(parenSequence, worstIndexes);
-        if (swapChild != null)
-            neighbors.add(swapChild);
+            child = TabuSearch.actionNewInWorstPlace(parenSequence, worstIndexes);
+            if (child.size() > 0)
+                neighbors.addAll(child);
 
-        neighbors.addAll(TabuSearch.actionNewInWorstPlace(parenSequence, worstIndexes.get(0)));
-        neighbors.addAll(TabuSearch.actionNewInWorstPlace(parenSequence, worstIndexes.get(1)));
+            child = TabuSearch.actionAddNewInRandomPlaceDeleteWorst(parenSequence, worstIndexes, true);
+            if (child.size() > 0)
+                neighbors.addAll(child);
 
-        Sequence child = TabuSearch.addNewInRandomPlaceDeleteWorst(parenSequence, worstIndexes, true);
-        if (child != null)
-            neighbors.add(child);
+            child = TabuSearch.actionAddNewInRandomPlaceDeleteWorst(parenSequence, worstIndexes, false);
+            if (child.size() > 0)
+                neighbors.addAll(child);
 
-        child = TabuSearch.addNewInRandomPlaceDeleteWorst(parenSequence, worstIndexes, false);
-        if (child != null)
-            neighbors.add(child);
+            child = TabuSearch.actionDelete(parenSequence, worstIndexes);
+            if (child.size() > 0)
+                neighbors.addAll(child);
 
-        for (Sequence s : neighbors)
-            System.out.println(s);
-
-
-//            if (iterationWithoutImprovement >= 10000) {
-//                break;
+//            for (Sequence s : neighbors) {
+//                int length = s.getLength();
+//                for (int i = 0; i < s.getOligonucleotidesList().size(); i++) {
+//                    TabuSearch.checkNewOffset(i, s.getOligonucleotidesList(), length);
+//                }
+//
+//                int newLength = s.getOligonucleotidesList().get(0).getSequence().length();
+//                if (s.getOligonucleotidesList().get(0).getOffset() != 0) {
+//                    System.out.println("Klopoty najmana");
+//                }
+//
+//                for (int i = 1; i < s.getOligonucleotidesList().size(); i++) {
+//                    newLength += s.getOligonucleotidesList().get(i).getOffset();
+//                }
+//
+//                if (length != newLength) {
+//                    System.out.println("Klopoty najmana znowu");
+//                }
+//
+////            System.out.println(s);
 //            }
-//    }
+
+            Collections.sort(neighbors);
+            Collections.reverse(neighbors);
+
+            int newParentIndex = findNewParendIndex(neighbors, tabuList);
+            if (newParentIndex == neighbors.size())
+                break;
+
+
+            if (parenSequence.getRating() > bestRating) {
+                bestSequence = new Sequence(neighbors.get(newParentIndex));
+                bestRating = bestSequence.getRating();
+                iterationWithoutImprovement = 0;
+            } else iterationWithoutImprovement++;
+
+            if (iterationWithoutImprovement % 100 == 0) {
+                useGreedySequenceIndex += 1;
+
+                if (useGreedySequenceIndex >= sortedGreedyInstances.size()) {
+                    break;
+                }
+
+                sortedGreedyInstances.get(useGreedySequenceIndex).setNotUsedOliList(TabuSearch.listOfNotUsedOli(sortedGreedyInstances.get(useGreedySequenceIndex)));
+                tabuList.add(sortedGreedyInstances.get(useGreedySequenceIndex));
+                parenSequence = new Sequence(sortedGreedyInstances.get(useGreedySequenceIndex));
+                continue;
+            }
+
+            if (iterationWithoutImprovement >= 1000) {
+                break;
+            }
+
+            if (tabuList.size() == itInTabuList)
+                tabuList.remove(0);
+
+            neighbors.get(newParentIndex).setNotUsedOliList(TabuSearch.listOfNotUsedOli(neighbors.get(newParentIndex)));
+            tabuList.add(neighbors.get(newParentIndex));
+            parenSequence = new Sequence(neighbors.get(newParentIndex));
+
+//            System.out.println(neighbors.get(0).getRating());
+        }
+
+        System.out.println(iteratonCounter);
+        System.out.println(bestSequence);
+        System.out.println(bestRating);
+        System.out.println(bestSequence.getLength());
+        System.out.println(bestSequence.getOligonucleotidesList().size());
     }
+
+    static int findNewParendIndex(List<Sequence> neighbors, List<Sequence> tabuList) {
+        int newParentIndex = neighbors.size();
+        for (int i = 0; i < neighbors.size(); i++) {
+            boolean onTabu = false;
+            for (Sequence t : tabuList) {
+                if (t.equals(neighbors.get(i))) {
+                    onTabu = true;
+                    break;
+                }
+            }
+            if (!onTabu) {
+                newParentIndex = i;
+                break;
+            }
+        }
+        return newParentIndex;
+    }
+
 }
