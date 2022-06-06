@@ -12,7 +12,7 @@ public class MatrixGenerator {
 
                 if (i == j) tempRowMatrix.add(100);
                 else {
-                    Integer offset = checkOffset(oligonucleotides.get(i), oligonucleotides.get(j), oligonucleotides.get(i).length());
+                    Integer offset = checkOffset(oligonucleotides.get(i), oligonucleotides.get(j));
                     tempRowMatrix.add(offset);
                 }
             }
@@ -22,8 +22,10 @@ public class MatrixGenerator {
         return tempMatrix;
     }
 
-    public static Integer checkOffset(String current, String next, int length) {
+    public static Integer checkOffset(String current, String next) {
+        int length = current.length();
         int offset = 1;
+
         for (int i = 1; i < length; i++) {
             if (current.substring(i, length).equals(next.substring(0, length - i))) {
                 break;
@@ -42,7 +44,7 @@ public class MatrixGenerator {
                     System.out.printf("%7s", oligonucleotides.get(i).charAt(l));
                 }
             }
-            System.out.println("");
+            System.out.println();
         }
         for (int i = 0; i < matrixList.size(); i++) {
             System.out.print(String.format("%2s", oligonucleotides.get(i)) + " |");
@@ -50,7 +52,7 @@ public class MatrixGenerator {
             for (int j = 0; j < matrixList.size(); j++) {
                 System.out.print(String.format("%5s", matrixList.get(i).get(j)) + " |");
             }
-            System.out.println("");
+            System.out.println();
         }
     }
 }
