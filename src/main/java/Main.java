@@ -54,9 +54,13 @@ public class Main {
         if (swapChild != null)
             neighbors.add(swapChild);
 
-        neighbors.addAll(TabuSearch.actionNewInWorstPlace(parenSequence, worstIndexes));
+        neighbors.addAll(TabuSearch.actionNewInWorstPlace(parenSequence, worstIndexes.get(0)));
+        neighbors.addAll(TabuSearch.actionNewInWorstPlace(parenSequence, worstIndexes.get(1)));
 
-        System.out.println(neighbors);
+//        neighbors.addAll();
+
+        for (Sequence s : neighbors)
+            System.out.println(s);
 
 
 //            if (iterationWithoutImprovement >= 10000) {

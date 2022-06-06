@@ -1,11 +1,36 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class TabuSearch {
 
-    static List<Sequence> actionNewInWorstPlace(Sequence parent, List<Integer> worstIndexes) {
+//    static List<Sequence> addNewInRandomPlace(Sequence parent, List<Integer> worstIndexes) {
+//        List<Oligonucleotide> oligonucleotidesList = new ArrayList<>();
+//
+//        for (Oligonucleotide o : parent.getOligonucleotidesList()) {
+//            oligonucleotidesList.add(new Oligonucleotide(o));
+//        }
+//
+//        oligonucleotidesList.remove(worstIndexes.get(0));
+//
+//        Random r = new Random();
+//        int randomPlace = r.nextInt(oligonucleotidesList.size() + 1);
+//
+//        for (int i = 0; i < )
+//        oligonucleotidesList.get(randomPlace).setSequence(parent.getNotUsedOliList().get(indexSeq));
+//
+//        int length = parent.getLength();
+//        length = checkNewOffset(worstIndexes.get(0), oligonucleotidesList, length);
+//
+//        if (length > Main.savedInstanceLength)
+//            return null;
+//
+//        return new Sequence(oligonucleotidesList, goalFunction(oligonucleotidesList), length);
+//    }
+
+
+    static List<Sequence> actionNewInWorstPlace(Sequence parent, Integer worstIndexes) {
         List<Sequence> sequences = new ArrayList<>();
         for (int i = 0; i < parent.getNotUsedOliList().size(); i++) {
             Sequence child = newInWorstPlace(parent, worstIndexes, i);
@@ -16,17 +41,17 @@ public class TabuSearch {
     }
 
 
-    static Sequence newInWorstPlace(Sequence parent, List<Integer> worstIndexes, int indexSeq) {
+    static Sequence newInWorstPlace(Sequence parent, Integer worstIndexes, int indexSeq) {
         List<Oligonucleotide> oligonucleotidesList = new ArrayList<>();
 
         for (Oligonucleotide o : parent.getOligonucleotidesList()) {
             oligonucleotidesList.add(new Oligonucleotide(o));
         }
 
-        oligonucleotidesList.get(worstIndexes.get(0)).setSequence(parent.getNotUsedOliList().get(indexSeq));
+        oligonucleotidesList.get(worstIndexes).setSequence(parent.getNotUsedOliList().get(indexSeq));
 
         int length = parent.getLength();
-        length = checkNewOffset(worstIndexes.get(0), oligonucleotidesList, length);
+        length = checkNewOffset(worstIndexes, oligonucleotidesList, length);
 
         if (length > Main.savedInstanceLength)
             return null;
@@ -35,11 +60,11 @@ public class TabuSearch {
     }
 
     static List<String> listOfNotUsedOli(Sequence sequence) {
-        List <String> notUsedOliList = new ArrayList<>();
+        List<String> notUsedOliList = new ArrayList<>();
 
         for (String oli : Main.oligonucleotidesList) {
             boolean notUsed = true;
-            for (Oligonucleotide o : sequence.getOligonucleotidesList()){
+            for (Oligonucleotide o : sequence.getOligonucleotidesList()) {
                 if (oli.equals(o.getSequence())) {
                     notUsed = false;
                 }
@@ -73,9 +98,9 @@ public class TabuSearch {
 
         Sequence child = new Sequence(oligonucleotidesList, goalFunction(oligonucleotidesList), length);
 
-        System.out.println("Parent   " + parent.getOligonucleotidesList());
-        System.out.println("Children " + oligonucleotidesList);
-        System.out.println("Children " + child.toString());
+//        System.out.println("Parent   " + parent.getOligonucleotidesList());
+//        System.out.println("Children " + oligonucleotidesList);
+//        System.out.println("Children " + child.toString());
 
         return child;
     }
@@ -90,10 +115,10 @@ public class TabuSearch {
             int oliOffset = parent.getOligonucleotidesList().get(i - 1).getOffset() + parent.getOligonucleotidesList().get(i).getOffset();
             if (oliOffset > worstOffsets.get(0)) {
                 worstOffsets.set(0, oliOffset);
-                worstIndexes.set(0, i-1);
+                worstIndexes.set(0, i - 1);
             } else if (oliOffset > worstOffsets.get(1)) {
                 worstOffsets.set(1, oliOffset);
-                worstIndexes.set(1, i-1);
+                worstIndexes.set(1, i - 1);
             }
         }
 
