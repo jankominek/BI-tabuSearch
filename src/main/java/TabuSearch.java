@@ -5,29 +5,32 @@ import java.util.Random;
 
 public class TabuSearch {
 
-//    static List<Sequence> addNewInRandomPlace(Sequence parent, List<Integer> worstIndexes) {
-//        List<Oligonucleotide> oligonucleotidesList = new ArrayList<>();
-//
-//        for (Oligonucleotide o : parent.getOligonucleotidesList()) {
-//            oligonucleotidesList.add(new Oligonucleotide(o));
-//        }
-//
-//        oligonucleotidesList.remove(worstIndexes.get(0));
-//
-//        Random r = new Random();
-//        int randomPlace = r.nextInt(oligonucleotidesList.size() + 1);
-//
-//        for (int i = 0; i < )
-//        oligonucleotidesList.get(randomPlace).setSequence(parent.getNotUsedOliList().get(indexSeq));
-//
-//        int length = parent.getLength();
-//        length = checkNewOffset(worstIndexes.get(0), oligonucleotidesList, length);
-//
-//        if (length > Main.savedInstanceLength)
-//            return null;
-//
-//        return new Sequence(oligonucleotidesList, goalFunction(oligonucleotidesList), length);
-//    }
+    static Sequence addNewInRandomPlaceDeleteWorst(Sequence parent, List<Integer> worstIndexes, boolean deleteWorst) {
+        List<Oligonucleotide> oligonucleotidesList = new ArrayList<>();
+
+        for (Oligonucleotide o : parent.getOligonucleotidesList()) {
+            oligonucleotidesList.add(new Oligonucleotide(o));
+        }
+
+        int length = parent.getLength();
+        if (deleteWorst) {
+            length = parent.getLength() - parent.getOligonucleotidesList().get(worstIndexes.get(0)).getOffset();
+            int temp_index = worstIndexes.get(0);
+            oligonucleotidesList.remove(temp_index);
+        }
+
+        int randomPlace = new Random().nextInt(oligonucleotidesList.size());
+
+        for (int i = 0; i < parent.getNotUsedOliList().size(); i++) {
+            oligonucleotidesList.add(randomPlace, new Oligonucleotide(parent.getNotUsedOliList().get(i), 0));
+            int temp_length = checkNewOffset(worstIndexes.get(0), oligonucleotidesList, length);
+            if (temp_length <= Main.savedInstanceLength) {
+                return new Sequence(oligonucleotidesList, goalFunction(oligonucleotidesList), temp_length);
+            }
+            oligonucleotidesList.remove(randomPlace);
+        }
+        return null;
+    }
 
 
     static List<Sequence> actionNewInWorstPlace(Sequence parent, Integer worstIndexes) {
