@@ -162,7 +162,6 @@ public class Main {
             neighbors.get(newParentIndex).setNotUsedOliList(TabuSearch.listOfNotUsedOli(neighbors.get(newParentIndex)));
             tabuList.add(neighbors.get(newParentIndex));
             parenSequence = new Sequence(neighbors.get(newParentIndex));
-
             if ((System.currentTimeMillis() - startTime) > 60000) {
                 break;
             }
@@ -176,6 +175,12 @@ public class Main {
         System.out.println("Num od used Oli:  " + bestSequence.getOligonucleotidesList().size());
         System.out.println("Best seq length:  " + bestSequence.getLength());
                 System.out.println(ANSI_RESET);
+                tabuList.clear();
+                oligonucleotidesList.clear();
+                generalGreedyMapInstances.clear();
+                usedIndexes.clear();
+                sortedGreedyInstances.clear();
+                matrix.clear();
             });
             interate.updateAndGet(v -> v + 1);
 
