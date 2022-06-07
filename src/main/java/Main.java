@@ -14,7 +14,7 @@ public class Main {
     public static final String ANSI_PURPLE = "\u001B[35m";
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
-    static List<String> ansiList = Arrays.asList("\u001B[31m", "\u001B[36m", "\u001B[37m", "\u001B[31m");
+    static List<String> ansiList = Arrays.asList("\u001B[30m", "\u001B[31m", "\u001B[32m", "\u001B[33m", "\u001B[34m","\u001B[35m" ,"\u001B[36m", "\u001B[37m");
     static List<String> oligonucleotidesList;
     static Integer savedInstanceLength;
     static List<List<Integer>> matrix;
@@ -48,6 +48,33 @@ public class Main {
 
                 Collections.sort(sortedGreedyInstances);
                 Collections.reverse(sortedGreedyInstances);
+                for (Sequence s : sortedGreedyInstances) {
+                    int oldLength = s.getLength();
+//            System.out.println("OldLength: " + oldLength);
+
+                    for (int i = 1; i < s.getOligonucleotidesList().size(); i++) {
+                        int newOffset = MatrixGenerator.checkOffset(s.getOligonucleotidesList().get(i-1).getSequence(),
+                                s.getOligonucleotidesList().get(i).getSequence());
+                        if (newOffset !=  s.getOligonucleotidesList().get(i).getOffset() || newOffset == 0 || s.getOligonucleotidesList().get(i).getOffset() == 0){
+                            System.out.println("old: "+ s.getOligonucleotidesList().get(i) + " new:" +  newOffset);
+                        }
+                        s.getOligonucleotidesList().get(i).setOffset(newOffset);
+                    }
+
+                    if (s.getOligonucleotidesList().get(0).getOffset() != 0) {
+                        System.out.println("Klopoty najmana 1");
+                    }
+
+                    int newLength = s.getOligonucleotidesList().get(0).getSequence().length();
+                    for (int i = 0; i < s.getOligonucleotidesList().size(); i++) {
+                        newLength += s.getOligonucleotidesList().get(i).getOffset();
+//                System.out.println("NewLength: " + newLength);
+                    }
+
+                    if (oldLength != newLength) {
+                        System.out.println("Klopoty najmana - zła długość");
+                    }
+                }
                 System.out.print(" file ---> " + file);
                 System.out.print("   olis size --->  " + sortedGreedyInstances.get(0).getOligonucleotidesList().size());
                 System.out.println();
