@@ -4,6 +4,38 @@ import java.util.Random;
 
 public class TabuSearch {
 
+    static List<Sequence> actionAddNew(Sequence parent) {
+        List<Sequence> sequences = new ArrayList<>();
+
+        for (int i = 0; i < parent.getNotUsedOliList().size(); i++) {
+            for (int j = 0; j < parent.getOligonucleotidesList().size(); j++) {
+                Sequence child = addNew(parent, i, j);
+                if (child != null)
+                    sequences.add(child);
+            }
+        }
+
+        return sequences;
+    }
+
+    static Sequence addNew(Sequence parent, int notUsedIndex, int newPlace) {
+        List<Oligonucleotide> oligonucleotidesList = new ArrayList<>();
+
+        for (Oligonucleotide o : parent.getOligonucleotidesList()) {
+            oligonucleotidesList.add(new Oligonucleotide(o));
+        }
+
+        oligonucleotidesList.add(newPlace, new Oligonucleotide(parent.getNotUsedOliList().get(notUsedIndex), 0));
+
+        int length = parent.getLength();
+        length = checkNewOffset(newPlace, oligonucleotidesList, length);
+
+        if (length > Main.savedInstanceLength)
+            return null;
+
+        return new Sequence(oligonucleotidesList, goalFunction(oligonucleotidesList, length), length);
+    }
+
     static List<Sequence> actionAddNewInRandomPlaceDeleteWorst(Sequence parent, List<Integer> worstIndexes, boolean deleteWorst) {
         List<Sequence> sequenceList = new ArrayList<>();
 
@@ -85,6 +117,7 @@ public class TabuSearch {
             for (Oligonucleotide o : sequence.getOligonucleotidesList()) {
                 if (oli.equals(o.getSequence())) {
                     notUsed = false;
+                    break;
                 }
             }
             if (notUsed)
@@ -185,8 +218,8 @@ public class TabuSearch {
     static List<Sequence> actionDelete(Sequence parent, List<Integer> worstIndexes) {
         List<Sequence> sequenceList = new ArrayList<>();
 
-        for (int i = 0; i < worstIndexes.size(); i++) {
-            Sequence child = deleteOli(parent, worstIndexes.get(i));
+        for (Integer worstIndex : worstIndexes) {
+            Sequence child = deleteOli(parent, worstIndex);
             if (child != null)
                 sequenceList.add(child);
         }
@@ -213,7 +246,9 @@ public class TabuSearch {
     }
 
     static Double goalFunction(List<Oligonucleotide> oligonucleotideList, int length) {
-        Double goalValue = oligonucleotideList.size() * 1.0 / Main.oligonucleotidesList.size() + (oligonucleotideList.size() * 1.0 / length);
-        return goalValue;
+        return oligonucleotideList.size() * 1.0 + oligonucleotideList.size() * 1.0 / Main.savedInstanceLength;
+    }
+    static Double goalFunction1(List<Oligonucleotide> oligonucleotideList, int length) {
+        return oligonucleotideList.size() * 1.0 / length;
     }
 }

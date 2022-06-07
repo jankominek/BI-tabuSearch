@@ -26,4 +26,6 @@ public class Sequence implements Comparable<Sequence> {
     public int compareTo(Sequence sequence) {
         return getRating().compareTo(sequence.getRating());
     }
+
+
 }

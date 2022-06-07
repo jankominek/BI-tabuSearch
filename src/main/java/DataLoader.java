@@ -27,6 +27,10 @@ public class DataLoader {
     }
 
     public static Integer getInstanceLength(List<String> oligonucleotides) {
-        return oligonucleotides.size() + oligonucleotides.get(0).length() - 1;
+//        return oligonucleotides.size() + oligonucleotides.get(0).length() - 1;
+        System.out.println("Please type instance length");
+        Scanner systemScanner = new Scanner(System.in);
+
+        return Integer.parseInt(systemScanner.nextLine());
     }
 }
