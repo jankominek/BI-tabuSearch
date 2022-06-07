@@ -41,7 +41,7 @@ public class Main {
                     e.printStackTrace();
                 }
                 System.out.println("=========================");
-                System.out.println("File name ----->  " + file);
+                System.out.println(ansiList.get(interate.get()%ansiList.size()) + "File name ----->  " + file);
                 System.out.println("=========================");
 
                 savedInstanceLength = Integer.parseInt(file.substring(file.length()-3, file.length()));
@@ -174,13 +174,14 @@ public class Main {
         System.out.println("Best Rating:      " + bestRating);
         System.out.println("Num od used Oli:  " + bestSequence.getOligonucleotidesList().size());
         System.out.println("Best seq length:  " + bestSequence.getLength());
-                System.out.println(ANSI_RESET);
                 tabuList.clear();
                 oligonucleotidesList.clear();
                 generalGreedyMapInstances.clear();
                 usedIndexes.clear();
                 sortedGreedyInstances.clear();
                 matrix.clear();
+                iterationWithoutImprovement = 0;
+                System.out.println(ANSI_RESET);
             });
             interate.updateAndGet(v -> v + 1);
 
