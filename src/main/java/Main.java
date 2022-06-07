@@ -1,7 +1,19 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Main {
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_BLACK = "\u001B[30m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_GREEN = "\u001B[32m";
+    public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_BLUE = "\u001B[34m";
+    public static final String ANSI_PURPLE = "\u001B[35m";
+    public static final String ANSI_CYAN = "\u001B[36m";
+    public static final String ANSI_WHITE = "\u001B[37m";
+    static List<String> ansiList = Arrays.asList("\u001B[31m", "\u001B[32m", "\u001B[33m", "\u001B[34m","\u001B[35m" ,"\u001B[36m", "\u001B[37m");
     static List<String> oligonucleotidesList;
     static Integer savedInstanceLength;
     static List<List<Integer>> matrix;
@@ -14,8 +26,26 @@ public class Main {
     static int itInTabuList = 10;
 
     public static void main(String[] args) throws IOException {
-        oligonucleotidesList = DataLoader.getOligonucleotidesFromFile();
-        savedInstanceLength = DataLoader.getInstanceLength(oligonucleotidesList);
+
+        List<List<String>> datas = DataLoader.getAllData();
+        System.out.println(datas.get(0).size()-1);
+        AtomicReference<Integer> interate = new AtomicReference<>(0);
+        datas.stream().forEach( (data) ->  {
+            String folderName = data.get(0);
+            data.remove(0);
+            System.out.println(ansiList.get(interate.get()%ansiList.size()) + "FOLDER NAME ---> " + folderName);
+            data.stream().forEach((file) -> {
+                try {
+                    oligonucleotidesList = DataLoader.getOligonucleotidesFromFileWithName(folderName, file);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("=========================");
+                System.out.println("File name ----->  " + file);
+                System.out.println("=========================");
+
+                savedInstanceLength = Integer.parseInt(file.substring(file.length()-3, file.length()));
+
 
         matrix = MatrixGenerator.generateMatrix(oligonucleotidesList);
 //        MatrixGenerator.printMatrix(matrix, oligonucleotidesList);
@@ -145,6 +175,11 @@ public class Main {
         System.out.println("Best Rating:      " + bestRating);
         System.out.println("Num od used Oli:  " + bestSequence.getOligonucleotidesList().size());
         System.out.println("Best seq length:  " + bestSequence.getLength());
+                System.out.println(ANSI_RESET);
+            });
+            interate.updateAndGet(v -> v + 1);
+
+        });
     }
 
     static int findNewParendIndex(List<Sequence> neighbors, List<Sequence> tabuList) {
