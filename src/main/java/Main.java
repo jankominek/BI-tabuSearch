@@ -63,29 +63,8 @@ public class Main {
                 neighbors.addAll(child);
             }
 
-            for (Sequence s : neighbors) {
-                int length = s.getLength();
-                for (int i = 0; i < s.getOligonucleotidesList().size(); i++) {
-                    TabuSearch.checkNewOffset(i, s.getOligonucleotidesList(), length);
-                }
-
-                int newLength = s.getOligonucleotidesList().get(0).getSequence().length();
-                if (s.getOligonucleotidesList().get(0).getOffset() != 0) {
-                    System.out.println("Klopoty najmana");
-                }
-
-                for (int i = 1; i < s.getOligonucleotidesList().size(); i++) {
-                    newLength += s.getOligonucleotidesList().get(i).getOffset();
-                }
-
-                if (length != newLength) {
-                    System.out.println("Klopoty najmana znowu");
-                }
-
-//            System.out.println(s);
-            }
 //            for (Sequence n : neighbors) {
-////                if (iterationWithoutImprovement % 2 < 1)
+//                if (iterationWithoutImprovement % 2 < 1)
 //                    n.setRating(TabuSearch.goalFunction(n.getOligonucleotidesList(), n.getLength()));
 //                else
 //                    n.setRating(TabuSearch.goalFunction1(n.getOligonucleotidesList(), n.getLength()));
